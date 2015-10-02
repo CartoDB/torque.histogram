@@ -1,7 +1,7 @@
 
 This is a torque widget that shows an histogram of the values
 
-![histogram gif](./img/histogram_torque.png)
+![histogram gif](./img/histogram_torque.gif)
 
 ## how to use it
 
