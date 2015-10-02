@@ -1,0 +1,118 @@
+<html>
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
+  <link rel="stylesheet" href="torque.histogram.css" />
+  <style>
+    #map, html, body {
+      width: 100%; height: 100%; padding: 0; margin: 0;
+    }
+    #histogram_wrapper {
+      position: absolute;
+      top: 100px; left: 100px;
+      width: 300px;
+      height: 120px;
+      padding: 10px;
+      background: white;
+    }
+
+    #histogram {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <body>
+    <div id="map"></div>
+    <div id="histogram_wrapper">
+      <div id="histogram"></div>
+    </div>
+
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.js" charset="utf-8"></script>
+    <script src="vendor/torque.full.uncompressed.js"></script>
+    <script src="torque.histogram.js"></script>
+
+
+    <script>
+      // define the torque layer style using cartocss
+      var CARTOCSS = [
+          'Map {',
+          '-torque-time-attribute: "cartodb_id";',
+          '-torque-aggregation-function: "avg(mass_g)";',
+          '-torque-frame-count: 1;',
+          '-torque-animation-duration: 30;',
+          '-torque-resolution: 1',
+          '}',
+          '#layer {',
+          //'  marker-type: rectangle;',
+          '  marker-fill-opacity: 0.4;',
+          '  marker-fill: #FE4444; ',
+          '  marker-line-color: #FFF; ',
+          '  marker-line-width: 0.5;',
+
+          //'  comp-op: "lighten";',
+          '}',
+          '#layer [ value <= 60000000.0] {',
+             'marker-width: 12.0;',
+          '}',
+          '#layer [ value <= 4416.0] {',
+             'marker-width: 10.9;',
+          '}',
+          '#layer [ value <= 1198.7] {',
+             'marker-width: 9.8;',
+          '}',
+          '#layer [ value <= 518.5] {',
+             'marker-width: 8.7;',
+          '}',
+          '#layer [ value <= 267.1] {',
+             'marker-width: 7.6;',
+          '}',
+          '#layer [ value <= 149.2] {',
+             'marker-width: 6.4;',
+          '}',
+          '#layer [ value <= 86.1] {',
+             'marker-width: 5.3;',
+          '}',
+          '#layer [ value <= 48.6] {',
+             'marker-width: 4.2;',
+          '}',
+          '#layer [ value <= 25.16] {',
+             'marker-width: 3.1;',
+          '}',
+          '#layer [ value <= 10.6] {',
+             'marker-width: 2.0;',
+          '}'
+      ].join('\n');
+
+
+        
+      var map = new L.Map('map', {
+        zoomControl: true,
+        center: [40, 0],
+        zoom: 3
+      });
+
+      L.tileLayer('http://{s}.api.cartocdn.com/base-dark/{z}/{x}/{y}.png', {
+        attribution: 'CartoDB'
+      }).addTo(map);
+
+      var torqueLayer = new L.TorqueLayer({
+        user       : 'osm2',
+        //table      : 'meteoritessize',
+        sql: 'select * from meteoritessize where mass_g < 1000',
+        cartocss: CARTOCSS,
+        valueDataType: torque.types.Uint32Array
+
+      });
+      torqueLayer.error(function(err){
+        for(error in err){
+          console.warn(err[error]);
+        }
+      });
+      torqueLayer.addTo(map);
+      torqueLayer.play()
+      torque.widgets.histogram('#histogram', torqueLayer);
+
+
+    </script>
+  </body>
+</html>
+
